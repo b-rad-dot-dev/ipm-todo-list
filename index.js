@@ -13,21 +13,19 @@ export default class IpmTodoListModule {
   }
 
   async init() {
-    this.shadow = this.wrapper.attachShadow({ mode: "open" });
-
     // Load CSS file
     const cssText = await fetch(new URL("./styles.css", import.meta.url))
         .then(res => res.text());
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(cssText);
-    this.shadow.adoptedStyleSheets = [sheet];
+    this.wrapper.adoptedStyleSheets.push(sheet);
 
     // Load HTML template
     const html = await fetch(new URL("./module.html", import.meta.url))
-    this.shadow.innerHTML = await html.text();
+    this.wrapper.innerHTML = await html.text();
 
-    this.input = this.shadow.querySelector('.todo-input');
-    this.list = this.shadow.querySelector('.todo-list');
+    this.input = this.wrapper.querySelector('.todo-input');
+    this.list = this.wrapper.querySelector('.todo-list');
 
     this.input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && this.input.value.trim()) {
