@@ -1,6 +1,6 @@
-class IpmTodoListModule {
+export default class IpmTodoListModule {
   constructor(container, config) {
-    this.container = container;
+    this.wrapper = container;
     this.config = config;
     this.todos = this.loadTodos();
     this.editModeId = null;
@@ -13,13 +13,21 @@ class IpmTodoListModule {
   }
 
   async init() {
-    // Load HTML template
-    const response = await fetch('/modules/ipm-todo-list/module.html');
-    const html = await response.text();
-    this.container.innerHTML = html;
+    this.shadow = this.wrapper.attachShadow({ mode: "open" });
 
-    this.input = this.container.querySelector('.todo-input');
-    this.list = this.container.querySelector('.todo-list');
+    // Load CSS file
+    const cssText = await fetch(new URL("./styles.css", import.meta.url))
+        .then(res => res.text());
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(cssText);
+    this.shadow.adoptedStyleSheets = [sheet];
+
+    // Load HTML template
+    const html = await fetch(new URL("./module.html", import.meta.url))
+    this.shadow.innerHTML = await html.text();
+
+    this.input = this.shadow.querySelector('.todo-input');
+    this.list = this.shadow.querySelector('.todo-list');
 
     this.input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && this.input.value.trim()) {
@@ -418,5 +426,3 @@ class IpmTodoListModule {
     // Cleanup if needed
   }
 }
-
-window.IpmTodoListModule = IpmTodoListModule;
